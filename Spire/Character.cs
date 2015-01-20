@@ -9,6 +9,7 @@
 // ------------------------------------------------------------------------------
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 
 namespace Spire
@@ -55,31 +56,26 @@ namespace Spire
 		
 		
 		public void PickName(){
-			do {
-				Console.Clear ();
-				Console.Out.WriteLine ("What is your name?");
-				Name = Console.ReadLine ();
-				if(!string.IsNullOrWhiteSpace(Name) && Name.Length <20){
-					correct = 1;
-				}else{}
-			} while(correct == 0);
-			correct = 0;
+            var prompt = "What is your name?";
+            Name = ReadValidInput(prompt, x => !string.IsNullOrWhiteSpace(x) && x.Length < 20);
 		}
 		
 		public void PickGender(){
-			do {
-				Console.Clear ();
-				Console.Out.WriteLine ("Please Select a Gender");
-				Console.Out.WriteLine ("Male/Female");
-				Gender = Console.ReadLine ().ToUpper ();
-				if (Gender.Equals ("MALE") || Gender.Equals ("FEMALE"))
-					correct = 1;
-				else {
-				}
-			} while(correct == 0);
-			
-			correct = 0;
+            var genders = new[] { "MALE", "FEMALE" /*, other genders */};
+            var prompt = "Please Select a Gender\nMale/Female";
+            Gender = ReadValidInput(prompt, x =>  genders.Contains( x.ToUpper() ) );
 		}
+
+        private string ReadValidInput(string prompt, Predicate<string> condition)
+        {
+            do {
+                Console.Clear();
+                Console.Out.WriteLine(prompt);
+                var str = Console.ReadLine();
+                if (condition(str))
+                    return str;
+            } while (0 == 0);
+        }
 		
 		public void PickRace(){
 			do {
@@ -281,7 +277,8 @@ namespace Spire
 		}
 
 		public void RemoveItem(string item){
-			if (inventory.Exists (item)) {
+            //  Either use Contains(item), or 
+			if (inventory.Exists (x=> x == item)) {
 				inventory.Remove (item);
 				Console.WriteLine ("{0} has been removed from your inventory", item);
 			} else {
